@@ -7,7 +7,8 @@ import org.graphstream.stream.*;
 
 
 
-public class Tutorial1 {
+public class AntSystem {
+	private static final double zo=0.7;
 	public static class Ant{
 		private int antID;
 		private String antName;
@@ -21,7 +22,6 @@ public class Tutorial1 {
 
 		private final double alpha=2.0;
 		private final double beta=3.0;
-		private final double zo=0.7;
 
 		private String deltaname;
 
@@ -43,13 +43,21 @@ public class Tutorial1 {
 		private void addDeltaToGraph(Graph graph){
 			for(int i=0;i<100;i++){
 			Node node = graph.getNode(i);
-			for(Edge edge: node.getEachEdge()){
+			for(Edge edge: graph.getEachEdge()){
 				if(!edge.hasAttribute(deltaname)){
 					edge.addAttribute(deltaname,0.0);
 				}
 			}
 		}
 	
+		}
+
+		public double getbestcost(){
+			return bestcost;
+		}
+
+		public double getcost(){
+			return cost;
 		}
 
 		public int getAntID(){
@@ -125,18 +133,15 @@ public class Tutorial1 {
 			double num2Above = Math.pow(nuyAbove, beta);
 			double numberAbove = num1Above*num2Above;
 			double sum = 0.0;
-			for(int i=0;i<100;i++){
-				Node node = graph.getNode(i);
-				for(Edge e: node.getEachEdge()){
-					if(!e.hasAttribute("caculate_propability")){
-						e.addAttribute("caculate_propability");
-						double theta = e.getAttribute("theta");
-						double num1 = Math.pow(theta, alpha);
-						double nuy = e.getAttribute("nuy");
-						double num2 = Math.pow(nuy, beta);
-						double number = num1*num2;
-						sum+=number;
-					}
+			for(Edge e: graph.getEachEdge()){
+				if(!e.hasAttribute("caculate_propability")){
+					e.addAttribute("caculate_propability");
+					double theta = e.getAttribute("theta");
+					double num1 = Math.pow(theta, alpha);
+					double nuy = e.getAttribute("nuy");
+					double num2 = Math.pow(nuy, beta);
+					double number = num1*num2;
+					sum+=number;
 				}
 			}
 			if(sum==0){
@@ -179,15 +184,9 @@ public class Tutorial1 {
 	}
 
 	public static void addPhormone(Graph graph, int numberOfAnt){
-		for(int i=0;i<100;i++){
-			Node node = graph.getNode(i);
-			for(Edge edge: node.getEachEdge()){
-				if(!edge.hasAttribute("addPhormone")){
-					edge.addAttribute("addPhormone");
-					double sum = calculateDeltaSum(edge, numberOfAnt);
-					edge.setAttribute("theta", sum);						
-				}
-			}
+		for(Edge edge: graph.getEachEdge()){
+			double sum = calculateDeltaSum(edge, numberOfAnt);
+			edge.setAttribute("theta", (1-zo)*sum);
 		}
 	}
 
@@ -202,34 +201,19 @@ public class Tutorial1 {
 
 	public static void makeGraph(Graph graph){
 		// Add weight for edges 
-		for(int i=0;i<100;i++){
-			Node node = graph.getNode(i);
-			for(Edge edge: node.getEachEdge()){
-				if(!edge.hasAttribute("weight")){
-					edge.addAttribute("weight",1.0 );
-				}
-			}
+		for(Edge edge: graph.getEachEdge()){
+			edge.setAttribute("weight", 1.0);
 		}
 		
 		//Add nuy for edges
-		for(int i=0;i<100;i++){
-			Node node = graph.getNode(i);
-			for(Edge edge: node.getEachEdge()){
-				if(!edge.hasAttribute("nuy")){
-					double weight = edge.getAttribute("weight");
-					edge.setAttribute("nuy",1/weight);
-				}
-			}
+		for(Edge edge: graph.getEachEdge()){
+			double weight = edge.getAttribute("weight");
+			edge.setAttribute("nuy", 1.0/weight);
 		}
 
 		//Add theta for edges
-		for(int i=0;i<100;i++){
-			Node node = graph.getNode(i);
-			for(Edge edge: node.getEachEdge()){
-				if(!edge.hasAttribute("theta")){
-					edge.addAttribute("theta",0.0);
-				}
-			}
+		for(Edge edge: graph.getEachEdge()){
+			edge.setAttribute("theta", 0.0);
 		}	
 	}
 
@@ -246,28 +230,29 @@ public class Tutorial1 {
 		
 		makeGraph(graph);
 		//make dymanicity
-		//Algorithm algorithm = new ApparitionAlgorithm();
-		//algorithm.init(graph);
+		Random rand = new Random();
 
 		Node a = graph.getNode(0);
 		Node b = graph.getNode(11);
 		
 		Ant ant0 = new Ant(graph, 0, "ant0", a, b);
-		Ant ant2 = new Ant(graph, 2, "ant2", a, b);
-		Ant ant3 = new Ant(graph, 3, "ant0", a, b);
-
-		ArrayList<Ant> antList = new ArrayList<Ant>();
-		antList.add(ant0);
-		antList.add(ant2);
-		antList.add(ant3);
 
 		for(int i=0; i<10; i++){
-			//algorithm.compute();
+			double num = 2*rand.nextDouble();
+			for(Edge edge: graph.getEachEdge()){
+				int change = rand.nextInt(2);
+				if(change==0){
+					double weight = edge.getAttribute("weight");
+					edge.setAttribute("weight", num*weight);
+				}
+			}
 			ant0.iterate(graph);
-			System.out.println(ant0.getbestpath().toString());
+			System.out.println(ant0.getbestpath().toString()+":::::::::::"+
+			String.valueOf(ant0.getbestcost()));
 			ant0.clear(graph);
 			System.out.println("================================================");
 		}
+		
 	}
 }
 
