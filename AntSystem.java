@@ -11,7 +11,7 @@ import org.graphstream.algorithm.Dijkstra;
 
 public class AntSystem {
 	private static final double maxcost=1000000;
-	private static final double zo=0.7;
+	private static final double zo=0.3;
 	public static class Ant{
 		private int antID;
 		private String antName;
@@ -193,13 +193,6 @@ public class AntSystem {
 				bestcost = cost;
 				bestpath = path;
 			}
-			Dijkstra dijkstra = new Dijkstra(Dijkstra.Element.EDGE, null, "weight");
-			dijkstra.init(graph);
-			dijkstra.setSource(startVertex);
-			dijkstra.compute();
-			System.out.println("dijkstra:::::"+dijkstra.getPath(endIDVertex));
-			System.out.printf("dijkstra::::::: %s->%s:%10.2f%n", dijkstra.getSource(), endIDVertex,
-								dijkstra.getPathLength(endIDVertex));
 		} 
 	}
 
@@ -257,20 +250,16 @@ public class AntSystem {
 		Ant ant0 = new Ant(graph, 0, "ant0", a, b);
 
 		for(int i=0; i<100; i++){
-			double num = rand.nextDouble();
-			for(Edge edge: graph.getEachEdge()){
-				int change = rand.nextInt(3);
-				if(change==0){
-					double weight = edge.getAttribute("weight");
-					edge.setAttribute("weight", weight+num);
-				}else if(change==1){
-					double weight = edge.getAttribute("weight");
-					if(weight-num>=0){
-						edge.setAttribute("weight", weight-num);
-					}
-				}
-			}
 			ant0.iterate(graph);
+			
+			Dijkstra dijkstra = new Dijkstra(Dijkstra.Element.EDGE, null, "weight");
+			dijkstra.init(graph);
+			dijkstra.setSource(a);
+			dijkstra.compute();
+			System.out.println("dijkstra:::::"+dijkstra.getPath(b));
+			System.out.printf("dijkstra::::::: %s->%s:%10.2f%n", dijkstra.getSource(), b,
+								dijkstra.getPathLength(b));
+
 			System.out.println(ant0.getbestpath().toString()+":::::::::::"+
 			String.valueOf(ant0.getbestcost()));
 			ant0.clear(graph);
