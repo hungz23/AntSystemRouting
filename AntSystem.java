@@ -173,7 +173,16 @@ public class AntSystem {
 		}
 
 		public void iterate(Graph graph){
+			Random rand = new Random();
 			while(currNode!=endIDVertex){
+				double num = 2*rand.nextDouble();
+				for(Edge edge: graph.getEachEdge()){
+					int change = rand.nextInt(2);
+					if(change==0){
+						double weight = edge.getAttribute("weight");
+						edge.setAttribute("weight", num*weight);
+					}
+				}
 				move(graph);
 			}
 			if(cost<bestcost){
@@ -218,15 +227,13 @@ public class AntSystem {
 	}
 
 	public static void main(String args[]) {
-		Graph graph = new SingleGraph("grid");
-		Generator gen = new GridGenerator();
-		gen.addSink(graph);
-		gen.begin();
-
-		for(int i=0; i<10; i++) {
-			gen.nextEvents();
-		}
-		gen.end();
+		Graph graph = new SingleGraph("Random");
+		    Generator gen = new RandomGenerator(50);
+		    gen.addSink(graph);
+		    gen.begin();
+		    for(int i=0; i<100; i++)
+		        gen.nextEvents();
+		    gen.end();
 		
 		makeGraph(graph);
 		//make dymanicity
