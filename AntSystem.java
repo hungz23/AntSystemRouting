@@ -162,7 +162,18 @@ public class AntSystem {
 
 		public boolean move(Graph graph){
 			Node previous_node = currNode; int count=0;
+			Random rand = new Random();
 			while(currNode == previous_node){
+				int r1 = rand.nextInt(10);
+				if(r1<5){
+					for(Edge edge: currNode.getEachEdge()){
+						int r2 = rand.nextInt(50);
+						if(r2<10){
+							walk(currNode, edge);
+							break;
+						}
+					}
+				}
 				for(Edge edge: currNode.getEachEdge()){
 					if(!edge.getOpposite(currNode).hasAttribute("visited")){						
 						if(halt(graph, edge)){
@@ -178,6 +189,7 @@ public class AntSystem {
 				}
 				if(count==0) return false;  
 			}
+			
 			return true;
 		}
 
@@ -283,7 +295,7 @@ public class AntSystem {
 		
 	}
 }
-
+//buddha@hung103
 
 
 
