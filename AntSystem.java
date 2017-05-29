@@ -17,6 +17,7 @@ public class AntSystem {
 		private String antName;
 		private Node currNode;
 		private List<String> path;
+		private List<Edge> edgePath;
 		private Node startVertex;
 		private Node endIDVertex;
 		private double cost;
@@ -38,6 +39,7 @@ public class AntSystem {
 			this.bestpath = new ArrayList<String>();
 			this.bestcost = maxcost;
 			this.deltaname = "delta"+Integer.toString(antID);
+			this.edgePath = new ArrayList<Edge>();
 			currNode.setAttribute("visited");
 			path.add(currNode.toString());
 			addDeltaToGraph(graph);
@@ -46,7 +48,8 @@ public class AntSystem {
 		private void addDeltaToGraph(Graph graph){
 			for(Edge edge: graph.getEachEdge()){
 				if(!edge.hasAttribute(deltaname)){
-					edge.addAttribute(deltaname,0.0);
+					if(cost==0) edge.addAttribute(deltaname,0.0);
+					else edge.setAttribute(deltaname, 1.0/getcost());
 				}
 			}
 		}
@@ -91,6 +94,12 @@ public class AntSystem {
 		}
 
 		public double getCost(){
+			double sum = 0.0;
+			for(Edge edge: edgePath){
+				double weight = edge.getAttribute("weight");
+				sum+=weight;
+			}
+			cost = sum;
 			return cost;
 		}
 
@@ -112,7 +121,8 @@ public class AntSystem {
 		private void walk(Node node, Edge edge){
 				moveTo(edge.getOpposite(node));
 				double weight = edge.getAttribute("weight");
-				cost+= weight;
+				edgePath.add(edge);
+				cost+= getCost();
 				edge.setAttribute(deltaname, 1/cost);
 		}
 
@@ -174,6 +184,7 @@ public class AntSystem {
 		public void iterate(Graph graph){
 			Random rand = new Random();
 			while(currNode!=endIDVertex){
+				addDeltaToGraph(graph);
 				double num = rand.nextDouble();
 				for(Edge edge: graph.getEachEdge()){
 					int change = rand.nextInt(3);
@@ -186,6 +197,8 @@ public class AntSystem {
 							edge.setAttribute("weight", weight-num);
 						}
 					}
+					double weight = edge.getAttribute("weight");
+					edge.setAttribute("nuy",1.0/weight);
 				}
 				move(graph);
 			}
@@ -198,8 +211,9 @@ public class AntSystem {
 
 	public static void addPhormone(Graph graph, int numberOfAnt){
 		for(Edge edge: graph.getEachEdge()){
+			double theta = edge.getAttribute("theta");
 			double sum = calculateDeltaSum(edge, numberOfAnt);
-			edge.setAttribute("theta", (1-zo)*sum);
+			edge.setAttribute("theta", theta+(1-zo)*sum);
 		}
 	}
 
