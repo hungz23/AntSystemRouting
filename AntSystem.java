@@ -11,7 +11,7 @@ import org.graphstream.algorithm.Dijkstra;
 
 public class AntSystem {
 	private static final double maxcost=1000000;
-	private static final double zo=0.3;
+	private static final double zo=0.7;
 	public static class Ant{
 		private int antID;
 		private String antName;
@@ -25,7 +25,7 @@ public class AntSystem {
 		private double bestcost;
 
 		private final double alpha=2.0;
-		private final double beta=4.0;
+		private final double beta=5.0;
 
 		private String deltaname;
 
@@ -122,7 +122,7 @@ public class AntSystem {
 				moveTo(edge.getOpposite(node));
 				double weight = edge.getAttribute("weight");
 				edgePath.add(edge);
-				cost+= getCost();
+				cost= getCost();
 				edge.setAttribute(deltaname, 1/cost);
 		}
 
@@ -182,24 +182,8 @@ public class AntSystem {
 		}
 
 		public void iterate(Graph graph){
-			Random rand = new Random();
 			while(currNode!=endIDVertex){
 				addDeltaToGraph(graph);
-				double num = rand.nextDouble();
-				for(Edge edge: graph.getEachEdge()){
-					int change = rand.nextInt(3);
-					if(change==0){
-						double weight = edge.getAttribute("weight");
-						edge.setAttribute("weight", weight+num);
-					}else if(change==1){
-						double weight = edge.getAttribute("weight");
-						if(weight-num>=0){
-							edge.setAttribute("weight", weight-num);
-						}
-					}
-					double weight = edge.getAttribute("weight");
-					edge.setAttribute("nuy",1.0/weight);
-				}
 				move(graph);
 			}
 			if(cost<bestcost){
@@ -263,9 +247,26 @@ public class AntSystem {
 		
 		Ant ant0 = new Ant(graph, 0, "ant0", a, b);
 
-		for(int i=0; i<100; i++){
+		for(int i=0; i<200; i++){
 			ant0.iterate(graph);
-			
+			//dynamicity co the bo de test graph tinh
+			double num = rand.nextDouble();
+			for(Edge edge: graph.getEachEdge()){
+				int change = rand.nextInt(20);
+				if(change==0){
+					double weight = edge.getAttribute("weight");
+					edge.setAttribute("weight", weight+num);
+				}else if(change==1){
+					double weight = edge.getAttribute("weight");
+					if(weight-num>=0){
+						edge.setAttribute("weight", weight-num);
+					}
+				}
+				double weight = edge.getAttribute("weight");
+				edge.setAttribute("nuy",1.0/weight);
+			}
+			//dynamicity
+
 			Dijkstra dijkstra = new Dijkstra(Dijkstra.Element.EDGE, null, "weight");
 			dijkstra.init(graph);
 			dijkstra.setSource(a);
