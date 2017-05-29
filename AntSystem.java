@@ -25,7 +25,7 @@ public class AntSystem {
 		private double bestcost;
 
 		private final double alpha=2.0;
-		private final double beta=5.0;
+		private final double beta=3.0;
 
 		private String deltaname;
 
@@ -259,12 +259,12 @@ public class AntSystem {
 		
 		Ant ant0 = new Ant(graph, 0, "ant0", a, b);
 
-		for(int i=0; i<200; i++){
+		for(int i=0; i<20; i++){
 			ant0.iterate(graph);
 			//dynamicity co the bo de test graph tinh
 			double num = rand.nextDouble();
 			for(Edge edge: graph.getEachEdge()){
-				int change = rand.nextInt(20);
+				int change = rand.nextInt(200);
 				if(change==0){
 					double weight = edge.getAttribute("weight");
 					edge.setAttribute("weight", weight+num);
@@ -276,6 +276,7 @@ public class AntSystem {
 				}
 				double weight = edge.getAttribute("weight");
 				edge.setAttribute("nuy",1.0/weight);
+				//edge.setAttribute("delta0", 0.0);
 			}
 			//dynamicity
 
@@ -295,7 +296,7 @@ public class AntSystem {
 		
 	}
 }
-//buddha@hung103
+//
 
 
 
