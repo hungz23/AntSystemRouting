@@ -28,7 +28,7 @@ public class AntSystem {
 		private final double beta=3.0;
 
 		private String deltaname;
-
+// Init
 		Ant(Graph graph, int antID, String antName, Node startVertex, Node endIDVertex ){
 			this.antID = antID;
 			this.antName = antName;
@@ -44,7 +44,7 @@ public class AntSystem {
 			path.add(currNode.toString());
 			addDeltaToGraph(graph);
 		}
-
+// Them delta cua kien cho graph
 		private void addDeltaToGraph(Graph graph){
 			for(Edge edge: graph.getEachEdge()){
 				if(!edge.hasAttribute(deltaname)){
@@ -110,7 +110,7 @@ public class AntSystem {
 			return "nope";
 		}
 
-		private void moveTo(Node target){
+		private void moveTo(Node target){//Di den node, ham phu cho walk
 			if(!target.hasAttribute("visited")){
 				this.currNode = target;
 				target.setAttribute("visited");
@@ -118,15 +118,16 @@ public class AntSystem {
 			}
 		}
 
-		private void walk(Node node, Edge edge){
+		private void walk(Node node, Edge edge){// Thuc hien di sau khi da quyet dinh
 				moveTo(edge.getOpposite(node));
 				double weight = edge.getAttribute("weight");
-				edgePath.add(edge);
-				cost= getCost();
-				edge.setAttribute(deltaname, 1/cost);
+			//Cap nhat moi cho Kien
+				edgePath.add(edge);//Them canh vao path
+				cost= getCost();// Them chi phi
+				edge.setAttribute(deltaname, 1/cost);//Cap nhat delta cua kien
 		}
 
-		private boolean halt(Graph graph, Edge edge){
+		private boolean halt(Graph graph, Edge edge){//Quyet dinh xem co di ko theo xac suat dc tinh
 			Random random = new Random();
 			double  n = random.nextDouble();
 			if(n < caculate_propability(edge, graph)){
@@ -135,7 +136,7 @@ public class AntSystem {
 			return false;
 		}
 
-		private double caculate_propability(Edge edge, Graph graph){
+		private double caculate_propability(Edge edge, Graph graph){//Tinh xac suat theo cong thuc o paper
 			double thetaAbove = edge.getAttribute("theta");
 			double num1Above = Math.pow(thetaAbove, alpha);
 			double nuyAbove = edge.getAttribute("nuy");
@@ -165,7 +166,7 @@ public class AntSystem {
 			Random rand = new Random();
 			while(currNode == previous_node){
 				int r1 = rand.nextInt(10);
-				if(r1<5){
+				if(r1<5){//Xac suat 50% di bua
 					for(Edge edge: currNode.getEachEdge()){
 						int r2 = rand.nextInt(50);
 						if(r2<10){
@@ -176,14 +177,15 @@ public class AntSystem {
 				}
 				for(Edge edge: currNode.getEachEdge()){
 					if(!edge.getOpposite(currNode).hasAttribute("visited")){						
-						if(halt(graph, edge)){
+						if(halt(graph, edge)){//Neu ham halt tra ve true thi di qua canh nay
 							walk(currNode, edge);
 							break;
 						}
 					}
 					++count;
-					if(count > 100){
-						clear(graph);
+					if(count > 100){//Lap qua nhieu ma khong duoc thi di duong khac, do thi to thi cho to ra
+						//Vidu count>1000
+						clear(graph);//Cac thong so tro lai luc dau
 						break;
 					}
 				}
@@ -192,11 +194,12 @@ public class AntSystem {
 			
 			return true;
 		}
-
+//lap lien tuc cho den khi den diem cuoi (endIDVertex)
 		public void iterate(Graph graph){
 			while(currNode!=endIDVertex){
-				addDeltaToGraph(graph);
-				move(graph);
+				addDeltaToGraph(graph);//Them delta
+				move(graph);//Kien di chuyen trong graph
+				addPhormone(graph, 1);
 			}
 			if(cost<bestcost){
 				bestcost = cost;
@@ -204,7 +207,7 @@ public class AntSystem {
 			}
 		} 
 	}
-
+//cap nhat theta cho ca graph voi tat ca kien
 	public static void addPhormone(Graph graph, int numberOfAnt){
 		for(Edge edge: graph.getEachEdge()){
 			double theta = edge.getAttribute("theta");
@@ -212,16 +215,16 @@ public class AntSystem {
 			edge.setAttribute("theta", theta+(1-zo)*sum);
 		}
 	}
-
+//tinh tong cac delta
 	public static double calculateDeltaSum(Edge edge, int numberOfAnt){
 		double sum=0;
 		for(int i=0; i<numberOfAnt;i++){
-			double num = edge.getAttribute("deltaname"+Integer.toString(i));
+			double num = edge.getAttribute("delta"+Integer.toString(i));
 			sum+=num;
 		}
 		return sum;
 	}
-
+//Khoi tao graph voi cac thong so weight, nuy, theta
 	public static void makeGraph(Graph graph){
 		// Add weight for edges 
 		for(Edge edge: graph.getEachEdge()){
