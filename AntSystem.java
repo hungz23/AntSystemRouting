@@ -286,7 +286,7 @@ public class AntSystem {
 		for(int i=0; i<450; i++){
 			Ant ant0 = new Ant(graph, 0, "ant0", a, b);
 			ant0.iterate(graph);
-			ant0.test(graph);
+			//ant0.test(graph);
 			addPhormone(graph, 1);
 			ant0.clear(graph);
 
